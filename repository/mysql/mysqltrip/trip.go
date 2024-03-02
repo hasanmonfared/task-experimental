@@ -1,6 +1,7 @@
 package mysqltrip
 
 import (
+	"database/sql"
 	"gameapp/adapter/mysql"
 	"gameapp/entity/tripentity"
 	"gameapp/pkg/errmsg"
@@ -9,33 +10,24 @@ import (
 	"time"
 )
 
-func (d DB) GetTripByOrderID(ctx context.Context, orderID uint) ([]tripentity.Trip, error) {
+func (d DB) GetTripByOrderID(ctx context.Context, orderID uint) (tripentity.Trip, error) {
 	const op = "mysqlorderdelay.GetTripByOrderID"
 
-	trips := make([]tripentity.Trip, 0)
-
-	rows, err := d.adapter.Conn().QueryContext(ctx, `select * from trips where order_id= ?`, orderID)
+	row, err := d.adapter.Conn().QueryContext(ctx, `select * from trips where order_id= ?`, orderID)
+	trip, err := scanTrip(row)
 	if err != nil {
-		return nil, richerror.New(op).WithErr(err).WithMessage(errmsg.ErrorMsgSomethingWentWrong).WithKind(richerror.KindUnexpected)
-	}
-	defer rows.Close()
-	for rows.Next() {
-		rows.Scan()
-		acl, err := scanTrip(rows)
-		if err != nil {
-			return nil, richerror.New(op).WithErr(err).WithMessage(errmsg.ErrorMsgSomethingWentWrong).WithKind(richerror.KindUnexpected)
+		if err == sql.ErrNoRows {
+			return tripentity.Trip{}, richerror.New(op).WithErr(err).WithMessage(errmsg.ErrorMsgNotfound).WithKind(richerror.KindNotFound)
 		}
-		trips = append(trips, acl)
+		return tripentity.Trip{}, richerror.New(op).WithErr(err).WithMessage(errmsg.ErrorMsgCantScanQueryResult).WithKind(richerror.KindUnexpected)
 	}
-	if err := rows.Err(); err != nil {
-		return nil, richerror.New(op).WithErr(err).WithMessage(errmsg.ErrorMsgSomethingWentWrong).WithKind(richerror.KindUnexpected)
-
-	}
-	return trips, nil
+	return trip, nil
 }
 func scanTrip(scanner mysql.Scanner) (tripentity.Trip, error) {
 	var createdAt time.Time
 	var trip tripentity.Trip
-	err := scanner.Scan(&trip.ID, &trip.OrderID, &trip.Status, &createdAt)
+	var tripStatusStr string
+	err := scanner.Scan(&trip.ID, &trip.OrderID, &tripStatusStr, &createdAt)
+	trip.Status = tripentity.MapToStatusEntity(tripStatusStr)
 	return trip, err
 }

@@ -10,17 +10,17 @@ type Repository interface {
 	InsertDelayReport(ctx context.Context, orderID uint) error
 }
 type TripOrder interface {
-	GetTripsOrder(ctx context.Context, orderID uint) ([]tripentity.Trip, error)
+	GetTripOrder(ctx context.Context, orderID uint) (tripentity.Trip, error)
 }
 type LatencyEstimation interface {
 	GetEstimate(ctx context.Context, orderID uint) (estimateentity.Estimate, error)
 }
 type Service struct {
 	repo          Repository
-	tripRepo      TripOrder
+	tripOrder     TripOrder
 	ltcEstimation LatencyEstimation
 }
 
 func New(repo Repository, tripOrder TripOrder, ltcEstimation LatencyEstimation) Service {
-	return Service{repo: repo, tripRepo: tripOrder, ltcEstimation: ltcEstimation}
+	return Service{repo: repo, tripOrder: tripOrder, ltcEstimation: ltcEstimation}
 }

@@ -6,7 +6,7 @@ import (
 )
 
 type Repository interface {
-	GetTripByOrderID(ctx context.Context, orderID uint) ([]tripentity.Trip, error)
+	GetTripByOrderID(ctx context.Context, orderID uint) (tripentity.Trip, error)
 }
 type Service struct {
 	repo Repository

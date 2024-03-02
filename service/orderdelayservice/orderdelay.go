@@ -1,6 +1,7 @@
 package orderdelayservice
 
 import (
+	"gameapp/entity/tripentity"
 	"gameapp/param/orderdelayparam"
 	"gameapp/pkg/richerror"
 	"golang.org/x/net/context"
@@ -8,26 +9,36 @@ import (
 
 func (s Service) OrderDelay(ctx context.Context, req orderdelayparam.OrderDelayRequest) (orderdelayparam.OrderDelayResponse, error) {
 	const op = "orderdelayservice.OrderDelay"
-	trips, err := s.tripRepo.GetTripsOrder(ctx, req.OrderID)
+
+	trip, err := s.tripOrder.GetTripOrder(ctx, req.OrderID)
+
 	if err != nil {
 		return orderdelayparam.OrderDelayResponse{}, richerror.New(op).WithErr(err).WithKind(richerror.KindUnexpected)
 	}
-	numberOfTrips := len(trips)
-	if numberOfTrips > 0 {
+
+	if (tripentity.Trip{}) != trip {
+		
 		newEstimateTime, err := s.ltcEstimation.GetEstimate(ctx, req.OrderID)
+
 		if err != nil {
 			return orderdelayparam.OrderDelayResponse{}, richerror.New(op).WithErr(err).WithKind(richerror.KindUnexpected)
 		}
+
 		err = s.repo.InsertDelayReport(ctx, req.OrderID)
+
 		if err != nil {
 			return orderdelayparam.OrderDelayResponse{}, richerror.New(op).WithErr(err).WithKind(richerror.KindUnexpected)
 		}
+
 		return orderdelayparam.OrderDelayResponse{DeliveryTime: newEstimateTime.NewEstimate}, nil
 	} else {
+
 		err = s.repo.InsertDelayReport(ctx, req.OrderID)
+
 		if err != nil {
 			return orderdelayparam.OrderDelayResponse{}, richerror.New(op).WithErr(err).WithKind(richerror.KindUnexpected)
 		}
+
 		return orderdelayparam.OrderDelayResponse{}, nil
 	}
 }
