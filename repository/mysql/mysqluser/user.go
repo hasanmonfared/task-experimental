@@ -27,7 +27,7 @@ func (d *DB) IsPhoneNumberUnique(phoneNumber string) (bool, error) {
 	return false, nil
 }
 func (d *DB) Register(u entity.User) (entity.User, error) {
-	res, err := d.adapter.Conn().Exec(`insert into users(name,phone_number,password,role) values(?,?,?,?)`, u.Name, u.PhoneNumber, u.Password, u.Role.String())
+	res, err := d.adapter.Conn().Exec(`insert into users(name,phone_number,password,role) values(?,?,?,?)`, u.Name, u.PhoneNumber, u.Password)
 	if err != nil {
 		return entity.User{}, fmt.Errorf("can't execute command:%w", err)
 	}
@@ -64,6 +64,5 @@ func scanUser(scanner mysql.Scanner) (entity.User, error) {
 	var user entity.User
 	var roleStr string
 	err := scanner.Scan(&user.ID, &user.Name, &user.PhoneNumber, &createdAt, &user.Password, &roleStr)
-	user.Role = entity.MapToRoleEntity(roleStr)
 	return user, err
 }

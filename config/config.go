@@ -3,7 +3,6 @@ package config
 import (
 	"gameapp/adapter/mysql"
 	"gameapp/adapter/redis"
-	"gameapp/service/authservice"
 	"time"
 )
 
@@ -14,9 +13,8 @@ type HTTPServer struct {
 	Port int `koanf:"port"`
 }
 type Config struct {
-	Application Application        `koanf:"application"`
-	HTTPServer  HTTPServer         `koanf:"http_server"`
-	Auth        authservice.Config `koand:"auth"`
-	Mysql       mysql.Config       `koanf:"mysql"`
-	Redis       redis.Config       `koanf:"redis"`
+	Application Application  `koanf:"application"`
+	HTTPServer  HTTPServer   `koanf:"http_server"`
+	Mysql       mysql.Config `koanf:"mysql"`
+	Redis       redis.Config `koanf:"redis"`
 }
