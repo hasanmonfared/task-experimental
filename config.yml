@@ -1,0 +1,19 @@
+type: yml
+
+http_server:
+  port: 8787
+auth:
+  sign_key: hello
+
+mysql:
+  port: 3320
+  host: 127.0.0.1
+  dbname: app_db
+  username: user
+  password: wontbeused
+
+redis:
+  port: 6379
+  host: localhost
+  db: 0
+  password: ""
