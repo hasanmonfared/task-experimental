@@ -2,8 +2,8 @@
 create table orders
 (
     id            int primary key AUTO_INCREMENT,
-    user_id       int          not null,
-    vendor_id     int          not null,
+    user_id       int not null,
+    vendor_id     int not null,
     delivery_time date,
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users (id),

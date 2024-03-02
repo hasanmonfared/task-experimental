@@ -24,6 +24,7 @@ import (
 
 func main() {
 	cfg := config.Load("./config.yml")
+
 	mgr := migrator.New(cfg.Mysql)
 	mgr.Up()
 
@@ -49,18 +50,19 @@ func main() {
 }
 
 func setupServices(cfg config.Config) (userservice.Service, uservalidator.Validator, orderdelayservice.Service, orderdelayvalidator.Validator) {
+	// MYSQL
 	mysqlAdapter := mysql.New(cfg.Mysql)
-
+	// Order Delay
 	mysqlOrderDelay := mysqlorderdelay.New(mysqlAdapter)
 	mysqlTrip := mysqltrip.New(mysqlAdapter)
 	tripSvc := tripservice.New(mysqlTrip)
-	estimateClient := estimate.New("")
+	estimateClient := estimate.New(config.UrlForEstimateClient)
 	orderDelaySvc := orderdelayservice.New(mysqlOrderDelay, tripSvc, estimateClient)
-
-	mysqlUser := mysqluser.New(mysqlAdapter)
-	uV := uservalidator.New(&mysqlUser)
 	mysqlOrder := mysqlorder.New(mysqlAdapter)
 	orderV := orderdelayvalidator.New(mysqlOrder)
+	// User
+	mysqlUser := mysqluser.New(mysqlAdapter)
+	uV := uservalidator.New(&mysqlUser)
 	userSvc := userservice.New(&mysqlUser)
 	return userSvc, uV, orderDelaySvc, orderV
 }
