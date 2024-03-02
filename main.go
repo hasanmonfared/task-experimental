@@ -7,12 +7,14 @@ import (
 	"gameapp/config"
 	"gameapp/delivery/httpserver"
 	"gameapp/repository/migrator"
+	"gameapp/repository/mysql/mysqlorder"
 	"gameapp/repository/mysql/mysqlorderdelay"
 	"gameapp/repository/mysql/mysqltrip"
 	"gameapp/repository/mysql/mysqluser"
 	"gameapp/service/orderdelayservice"
 	"gameapp/service/tripservice"
 	"gameapp/service/userservice"
+	"gameapp/validator/orderdelayvalidator"
 	"gameapp/validator/uservalidator"
 	"golang.org/x/net/context"
 	"os"
@@ -25,8 +27,8 @@ func main() {
 	mgr := migrator.New(cfg.Mysql)
 	mgr.Up()
 
-	userSvc, userValidator, orderDelaySvc := setupServices(cfg)
-	server := httpserver.New(cfg, userSvc, userValidator, orderDelaySvc)
+	userSvc, userValidator, orderDelaySvc, orderDelayValidator := setupServices(cfg)
+	server := httpserver.New(cfg, userSvc, userValidator, orderDelaySvc, orderDelayValidator)
 
 	go func() {
 		server.Serve()
@@ -46,7 +48,7 @@ func main() {
 	<-ctxWithTimeout.Done()
 }
 
-func setupServices(cfg config.Config) (userservice.Service, uservalidator.Validator, orderdelayservice.Service) {
+func setupServices(cfg config.Config) (userservice.Service, uservalidator.Validator, orderdelayservice.Service, orderdelayvalidator.Validator) {
 	mysqlAdapter := mysql.New(cfg.Mysql)
 
 	mysqlOrderDelay := mysqlorderdelay.New(mysqlAdapter)
@@ -57,6 +59,8 @@ func setupServices(cfg config.Config) (userservice.Service, uservalidator.Valida
 
 	mysqlUser := mysqluser.New(mysqlAdapter)
 	uV := uservalidator.New(&mysqlUser)
+	mysqlOrder := mysqlorder.New(mysqlAdapter)
+	orderV := orderdelayvalidator.New(mysqlOrder)
 	userSvc := userservice.New(&mysqlUser)
-	return userSvc, uV, orderDelaySvc
+	return userSvc, uV, orderDelaySvc, orderV
 }

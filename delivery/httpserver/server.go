@@ -7,6 +7,7 @@ import (
 	"gameapp/delivery/httpserver/userhandler"
 	"gameapp/service/orderdelayservice"
 	"gameapp/service/userservice"
+	"gameapp/validator/orderdelayvalidator"
 	"gameapp/validator/uservalidator"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -19,11 +20,11 @@ type Server struct {
 	Router            *echo.Echo
 }
 
-func New(config config.Config, userSvc userservice.Service, userValidator uservalidator.Validator, orderDelaySvc orderdelayservice.Service) Server {
+func New(config config.Config, userSvc userservice.Service, userValidator uservalidator.Validator, orderDelaySvc orderdelayservice.Service, orderDelayValidator orderdelayvalidator.Validator) Server {
 	return Server{
 		config:            config,
 		userHandler:       userhandler.New(userSvc, userValidator),
-		orderDelayHandler: orderdelayhandler.New(orderDelaySvc),
+		orderDelayHandler: orderdelayhandler.New(orderDelaySvc, orderDelayValidator),
 		Router:            echo.New(),
 	}
 }
