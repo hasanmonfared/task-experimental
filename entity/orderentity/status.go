@@ -3,44 +3,38 @@ package orderentity
 type Status uint8
 
 const (
-	AssignedStatus = iota + 1
-	AtVendorStatus
-	PickedStatus
-	DeliveredStatus
+	SubmitStatus = iota + 1
+	InDoingStatus
+	ReadyToSendStatus
 )
 
 const (
-	AssignedStatusStr  = "assigned"
-	AtVendorStatusStr  = "at_vendor"
-	PickedStatusStr    = "picked"
-	DeliveredStatusStr = "delivered"
+	SubmitStatusStr      = "submit"
+	InDoingStatusStr     = "in_doing"
+	ReadyToSendStatusStr = "ready_to_send"
 )
 
 func (r Status) String() string {
 	switch r {
-	case AssignedStatus:
+	case SubmitStatus:
 
-		return AssignedStatusStr
-	case AtVendorStatus:
+		return SubmitStatusStr
+	case InDoingStatus:
 
-		return AtVendorStatusStr
-	case PickedStatus:
-		return PickedStatusStr
-	case DeliveredStatus:
-		return DeliveredStatusStr
+		return InDoingStatusStr
+	case ReadyToSendStatus:
+		return ReadyToSendStatusStr
 	}
 	return ""
 }
 func MapToStatusEntity(statusStr string) Status {
 	switch statusStr {
-	case AssignedStatusStr:
-		return AssignedStatus
-	case AtVendorStatusStr:
-		return AtVendorStatus
-	case PickedStatusStr:
-		return PickedStatus
-	case DeliveredStatusStr:
-		return DeliveredStatus
+	case SubmitStatusStr:
+		return SubmitStatus
+	case InDoingStatusStr:
+		return InDoingStatus
+	case ReadyToSendStatusStr:
+		return ReadyToSendStatus
 	}
 	return Status(0)
 }

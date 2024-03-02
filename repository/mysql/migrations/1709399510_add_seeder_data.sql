@@ -7,7 +7,7 @@ INSERT INTO `vendors` (`id`, `name`) VALUES(2, 'kababi');
 
 INSERT INTO `agents` (`id`, `firstname`,`lastname`) VALUES(1, 'hossein','doulabi');
 
-INSERT INTO `orders` (`id`, `user_id`,`vendor_id`,`delivery_time`) VALUES(1, 1,1,NOW());
+INSERT INTO `orders` (`id`, `user_id`,`vendor_id`,`delivery_time`,`status`) VALUES(1, 1,1,NOW(),'ready_to_send');
 
 
 -- +migrate Down

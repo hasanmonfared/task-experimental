@@ -9,9 +9,9 @@ import (
 	"time"
 )
 
-func (d DB) IsOrderByStatusesExist(orderID uint) (bool, error) {
-	const op = "mysqlorder.IsOrderByStatusesExist"
-	row := d.adapter.Conn().QueryRow(`select * from orders where id= ?`, orderID)
+func (d DB) IsOrderExceedingTheTimeDelivery(orderID uint) (bool, error) {
+	const op = "mysqlorder.IsOrderExceedingTheTimeDelivery"
+	row := d.adapter.Conn().QueryRow(`select * from orders where id= ? AND delivery_time<= NOW() AND status = ?`, orderID, orderentity.ReadyToSendStatusStr)
 	_, err := scanOrder(row)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -25,6 +25,8 @@ func (d DB) IsOrderByStatusesExist(orderID uint) (bool, error) {
 func scanOrder(scanner mysql.Scanner) (orderentity.Order, error) {
 	var createdAt time.Time
 	var order orderentity.Order
-	err := scanner.Scan(&order.ID, &order.UserID, &order.VendorID, &order.DeliveryTime, &createdAt)
+	var statusStr string
+	err := scanner.Scan(&order.ID, &order.UserID, &order.VendorID, &order.DeliveryTime, &statusStr, &createdAt)
+	order.Status = orderentity.MapToStatusEntity(statusStr)
 	return order, err
 }

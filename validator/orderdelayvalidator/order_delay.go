@@ -15,7 +15,7 @@ func (v Validator) ValidateOrderDelayRequest(req orderdelayparam.OrderDelayReque
 
 		validation.Field(&req.OrderID,
 			validation.Required,
-			validation.By(v.checkIsOrderByStatusesExist)),
+			validation.By(v.checkIsOrderTimeDelivery)),
 	); err != nil {
 		fieldErrors := make(map[string]string)
 		errV, ok := err.(validation.Errors)
@@ -35,9 +35,9 @@ func (v Validator) ValidateOrderDelayRequest(req orderdelayparam.OrderDelayReque
 	return nil, nil
 }
 
-func (v Validator) checkIsOrderByStatusesExist(value interface{}) error {
+func (v Validator) checkIsOrderTimeDelivery(value interface{}) error {
 	orderID := value.(uint)
-	if isExists, err := v.repo.IsOrderByStatusesExist(orderID); err != nil {
+	if isExists, err := v.repo.IsOrderExceedingTheTimeDelivery(orderID); err != nil {
 		if !isExists {
 			return fmt.Errorf(errmsg.ErrorMsgOrderIDNotValid)
 		}
