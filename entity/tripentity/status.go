@@ -3,7 +3,7 @@ package tripentity
 type Status uint8
 
 const (
-	AssignedStatus = iota + 1
+	AssignedStatus Status = iota + 1
 	AtVendorStatus
 	PickedStatus
 	DeliveredStatus
@@ -19,10 +19,8 @@ const (
 func (r Status) String() string {
 	switch r {
 	case AssignedStatus:
-
 		return AssignedStatusStr
 	case AtVendorStatus:
-
 		return AtVendorStatusStr
 	case PickedStatus:
 		return PickedStatusStr
@@ -42,5 +40,5 @@ func MapToStatusEntity(statusStr string) Status {
 	case DeliveredStatusStr:
 		return DeliveredStatus
 	}
-	return Status(0)
+	return 0
 }
