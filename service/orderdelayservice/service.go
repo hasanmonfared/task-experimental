@@ -13,7 +13,7 @@ type TripOrder interface {
 	GetTripOrder(ctx context.Context, orderID uint) (tripentity.Trip, error)
 }
 type LatencyEstimation interface {
-	GetEstimate(ctx context.Context, orderID uint) (estimateentity.Estimate, error)
+	GetEstimate(orderID uint) (estimateentity.Estimate, error)
 }
 type Service struct {
 	repo          Repository

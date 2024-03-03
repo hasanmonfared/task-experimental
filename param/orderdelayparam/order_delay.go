@@ -6,5 +6,6 @@ type OrderDelayRequest struct {
 	OrderID uint `json:"order_id"`
 }
 type OrderDelayResponse struct {
-	DeliveryTime time.Duration `json:"delivery_time"`
+	DeliveryTime time.Time `json:"delivery_time"`
+	Message      string    `json:"message"`
 }
