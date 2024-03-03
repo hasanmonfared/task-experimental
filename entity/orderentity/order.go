@@ -7,5 +7,6 @@ type Order struct {
 	UserID       uint      `json:"user_id"`
 	VendorID     uint      `json:"vendor_id"`
 	Status       Status    `json:"status"`
-	DeliveryTime time.Time `json:"delivery_time"`
+	DeliveryTime uint      `json:"delivery_time"`
+	CreatedAt    time.Time `json:"created_at"`
 }

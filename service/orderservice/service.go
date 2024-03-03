@@ -7,7 +7,6 @@ import (
 
 type Repository interface {
 	GetDetailOrderByID(ctx context.Context, orderID uint) (orderentity.Order, error)
-	IsOrderTheTimeDelivery(orderID uint) (bool, error)
 }
 type Service struct {
 	repo Repository

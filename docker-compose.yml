@@ -24,6 +24,7 @@ services:
       MYSQL_DATABASE: app_db
       MYSQL_USER: user
       MYSQL_PASSWORD: wontbeused
+      TZ: Asia/Tehran
     networks:
       - internal
 volumes:

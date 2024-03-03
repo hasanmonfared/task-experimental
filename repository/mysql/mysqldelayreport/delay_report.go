@@ -11,12 +11,12 @@ import (
 	"time"
 )
 
-func (d DB) InsertDelayReport(ctx context.Context, vendorID uint, orderID uint, deliveryTime time.Time) error {
+func (d DB) InsertDelayReport(ctx context.Context, vendorID uint, orderID uint, deliveryTime uint) error {
 	const op = "mysqldelayreport.InsertDelayReport"
 	var query string
 	var args []interface{}
 
-	if !deliveryTime.IsZero() {
+	if deliveryTime != 0 {
 		query = `INSERT INTO delay_reports (vendor_id,order_id, delivery_time) VALUES (?,?, ?)`
 		args = []interface{}{vendorID, orderID, deliveryTime}
 	} else {
@@ -89,7 +89,7 @@ func (d DB) CheckAgentBusyInQueue(AgentID uint) (bool, error) {
 func scanDelayReport(scanner mysql.Scanner) (delayreportentity.DelayReport, error) {
 	var report delayreportentity.DelayReport
 	var createdAt time.Time
-	var deliveryTime sql.NullTime
+	var deliveryTime sql.NullInt64
 	var agentID sql.NullInt64
 	err := scanner.Scan(&report.ID, &report.VendorID, &report.OrderID, &agentID, &report.DelayCheck, &deliveryTime, &createdAt)
 
@@ -97,7 +97,7 @@ func scanDelayReport(scanner mysql.Scanner) (delayreportentity.DelayReport, erro
 		report.AgentID = uint(agentID.Int64)
 	}
 	if deliveryTime.Valid {
-		report.DeliveryTime = deliveryTime.Time
+		report.DeliveryTime = uint(deliveryTime.Int64)
 	}
 	report.CreatedAt = createdAt
 	return report, err

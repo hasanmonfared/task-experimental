@@ -2,7 +2,6 @@ package estimate
 
 import (
 	"gameapp/entity/estimateentity"
-	"time"
 )
 
 type Client struct {
@@ -37,6 +36,5 @@ func (c Client) GetEstimate(orderID uint) (estimateentity.Estimate, error) {
 	//if err != nil {
 	//	return estimateentity.Estimate{}, richerror.New(op).WithErr(err)
 	//}
-	timeNow := time.Now()
-	return estimateentity.Estimate{NewEstimate: timeNow.Add(time.Second * 50)}, nil
+	return estimateentity.Estimate{NewEstimate: 50}, nil
 }
