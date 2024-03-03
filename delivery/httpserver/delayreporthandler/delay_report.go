@@ -1,20 +1,20 @@
-package orderdelayhandler
+package delayreporthandler
 
 import (
-	"gameapp/param/orderdelayparam"
+	"gameapp/param/delayreportparam"
 	"gameapp/pkg/httpmsg"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )
 
-func (h Handler) OrderDelay(c echo.Context) error {
+func (h Handler) delayReport(c echo.Context) error {
 
-	var req orderdelayparam.OrderDelayRequest
+	var req delayreportparam.DelayReportRequest
 
 	if err := c.Bind(&req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest)
 	}
-	if filedErrors, err := h.orderDelayValidator.ValidateOrderDelayRequest(req); err != nil {
+	if filedErrors, err := h.delayReportValidator.ValidateDelayReportRequest(req); err != nil {
 		msg, code := httpmsg.Error(err)
 		return c.JSON(code, echo.Map{
 			"message": msg,
@@ -23,7 +23,7 @@ func (h Handler) OrderDelay(c echo.Context) error {
 		return echo.NewHTTPError(code, msg, filedErrors)
 	}
 
-	resp, err := h.orderDelaySvc.OrderDelay(c.Request().Context(), orderdelayparam.OrderDelayRequest{OrderID: 1})
+	resp, err := h.delayReportSvc.DelayReport(c.Request().Context(), delayreportparam.DelayReportRequest{OrderID: 1})
 	if err != nil {
 		msg, code := httpmsg.Error(err)
 		return echo.NewHTTPError(code, msg)

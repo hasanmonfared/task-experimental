@@ -1,9 +1,9 @@
-package mysqlorderdelay
+package mysqldelayreport
 
 import (
 	"database/sql"
 	"gameapp/adapter/mysql"
-	"gameapp/entity/orderdelayentity"
+	"gameapp/entity/delayreportentity"
 	"gameapp/pkg/errmsg"
 	"gameapp/pkg/richerror"
 	"golang.org/x/net/context"
@@ -11,7 +11,7 @@ import (
 )
 
 func (d DB) InsertDelayReport(ctx context.Context, orderID uint, deliveryTime time.Time) error {
-	const op = "mysqlorderdelay.InsertDelayReport"
+	const op = "mysqldelayreport.InsertDelayReport"
 	var query string
 	var args []interface{}
 
@@ -31,7 +31,7 @@ func (d DB) InsertDelayReport(ctx context.Context, orderID uint, deliveryTime ti
 	return nil
 }
 func (d DB) HasPendingDelayReport(ctx context.Context, orderID uint) (bool, error) {
-	const op = "mysqlorderdelay.HasPendingDelayReport"
+	const op = "mysqldelayreport.HasPendingDelayReport"
 
 	row := d.adapter.Conn().QueryRowContext(ctx, `select * from delay_reports where order_id= ? AND delay_check = false`, orderID)
 	_, err := scanDelayReport(row)
@@ -43,8 +43,8 @@ func (d DB) HasPendingDelayReport(ctx context.Context, orderID uint) (bool, erro
 	}
 	return true, nil
 }
-func scanDelayReport(scanner mysql.Scanner) (orderdelayentity.DelayReport, error) {
-	var report orderdelayentity.DelayReport
+func scanDelayReport(scanner mysql.Scanner) (delayreportentity.DelayReport, error) {
+	var report delayreportentity.DelayReport
 	var createdAt time.Time
 	var deliveryTime sql.NullTime
 	var agentID sql.NullInt64

@@ -7,14 +7,14 @@ import (
 	"gameapp/config"
 	"gameapp/delivery/httpserver"
 	"gameapp/repository/migrator"
+	"gameapp/repository/mysql/mysqldelayreport"
 	"gameapp/repository/mysql/mysqlorder"
-	"gameapp/repository/mysql/mysqlorderdelay"
 	"gameapp/repository/mysql/mysqltrip"
 	"gameapp/repository/mysql/mysqluser"
-	"gameapp/service/orderdelayservice"
+	"gameapp/service/delayreportservice"
 	"gameapp/service/tripservice"
 	"gameapp/service/userservice"
-	"gameapp/validator/orderdelayvalidator"
+	"gameapp/validator/delayreportvalidator"
 	"gameapp/validator/uservalidator"
 	"golang.org/x/net/context"
 	"os"
@@ -28,8 +28,8 @@ func main() {
 	mgr := migrator.New(cfg.Mysql)
 	mgr.Up()
 
-	userSvc, userValidator, orderDelaySvc, orderDelayValidator := setupServices(cfg)
-	server := httpserver.New(cfg, userSvc, userValidator, orderDelaySvc, orderDelayValidator)
+	userSvc, userValidator, delayReportSvc, delayReportValidator := setupServices(cfg)
+	server := httpserver.New(cfg, userSvc, userValidator, delayReportSvc, delayReportValidator)
 
 	go func() {
 		server.Serve()
@@ -49,20 +49,20 @@ func main() {
 	<-ctxWithTimeout.Done()
 }
 
-func setupServices(cfg config.Config) (userservice.Service, uservalidator.Validator, orderdelayservice.Service, orderdelayvalidator.Validator) {
+func setupServices(cfg config.Config) (userservice.Service, uservalidator.Validator, delayreportservice.Service, delayreportvalidator.Validator) {
 	// MYSQL
 	mysqlAdapter := mysql.New(cfg.Mysql)
 	// Order Delay
-	mysqlOrderDelay := mysqlorderdelay.New(mysqlAdapter)
+	mysqldelayReport := mysqldelayreport.New(mysqlAdapter)
 	mysqlTrip := mysqltrip.New(mysqlAdapter)
 	tripSvc := tripservice.New(mysqlTrip)
 	estimateClient := estimate.New(config.UrlForEstimateClient)
-	orderDelaySvc := orderdelayservice.New(mysqlOrderDelay, tripSvc, estimateClient)
+	delayReportSvc := delayreportservice.New(mysqldelayReport, tripSvc, estimateClient)
 	mysqlOrder := mysqlorder.New(mysqlAdapter)
-	orderV := orderdelayvalidator.New(mysqlOrder)
+	orderV := delayreportvalidator.New(mysqlOrder)
 	// User
 	mysqlUser := mysqluser.New(mysqlAdapter)
 	uV := uservalidator.New(&mysqlUser)
 	userSvc := userservice.New(&mysqlUser)
-	return userSvc, uV, orderDelaySvc, orderV
+	return userSvc, uV, delayReportSvc, orderV
 }

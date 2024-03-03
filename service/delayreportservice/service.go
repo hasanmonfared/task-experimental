@@ -1,4 +1,4 @@
-package orderdelayservice
+package delayreportservice
 
 import (
 	"gameapp/entity/estimateentity"

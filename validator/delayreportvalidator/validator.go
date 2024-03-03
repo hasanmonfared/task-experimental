@@ -1,4 +1,4 @@
-package orderdelayvalidator
+package delayreportvalidator
 
 type Repository interface {
 	IsOrderExceedingTheTimeDelivery(orderID uint) (bool, error)

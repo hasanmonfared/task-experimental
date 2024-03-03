@@ -1,4 +1,4 @@
-package orderdelayentity
+package delayreportentity
 
 import "time"
 

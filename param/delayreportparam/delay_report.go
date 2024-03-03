@@ -1,11 +1,11 @@
-package orderdelayparam
+package delayreportparam
 
 import "time"
 
-type OrderDelayRequest struct {
+type DelayReportRequest struct {
 	OrderID uint `json:"order_id"`
 }
-type OrderDelayResponse struct {
+type DelayReportResponse struct {
 	DeliveryTime *time.Time `json:"delivery_time,omitempty"`
 	Message      string     `json:"message,omitempty"`
 }

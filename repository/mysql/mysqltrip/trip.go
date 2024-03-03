@@ -11,7 +11,7 @@ import (
 )
 
 func (d DB) GetTripByOrderID(ctx context.Context, orderID uint) (tripentity.Trip, error) {
-	const op = "mysqlorderdelay.GetTripByOrderID"
+	const op = "mysqltrip.GetTripByOrderID"
 
 	row := d.adapter.Conn().QueryRowContext(ctx, `select * from trips where order_id= ?`, orderID)
 	trip, err := scanTrip(row)

@@ -1,15 +1,15 @@
-package orderdelayvalidator
+package delayreportvalidator
 
 import (
 	"fmt"
-	"gameapp/param/orderdelayparam"
+	"gameapp/param/delayreportparam"
 	"gameapp/pkg/errmsg"
 	"gameapp/pkg/richerror"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
-func (v Validator) ValidateOrderDelayRequest(req orderdelayparam.OrderDelayRequest) (map[string]string, error) {
-	const op = "orderdelayvalidator.ValidateOrderDelayRequest"
+func (v Validator) ValidateDelayReportRequest(req delayreportparam.DelayReportRequest) (map[string]string, error) {
+	const op = "delayreportvalidator.ValidateDelayReportRequest"
 
 	if err := validation.ValidateStruct(&req,
 

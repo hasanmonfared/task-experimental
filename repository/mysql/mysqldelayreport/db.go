@@ -1,4 +1,4 @@
-package mysqlorderdelay
+package mysqldelayreport
 
 import "gameapp/adapter/mysql"
 
