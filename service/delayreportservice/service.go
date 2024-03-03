@@ -1,7 +1,9 @@
 package delayreportservice
 
 import (
+	"gameapp/entity/delayreportentity"
 	"gameapp/entity/estimateentity"
+	"gameapp/entity/orderentity"
 	"gameapp/entity/tripentity"
 	"golang.org/x/net/context"
 	"time"
@@ -10,9 +12,14 @@ import (
 type Repository interface {
 	InsertDelayReport(ctx context.Context, orderID uint, deliveryTime time.Time) error
 	HasPendingDelayReport(ctx context.Context, orderID uint) (bool, error)
+	GetFirstDelayReport(ctx context.Context) (delayreportentity.DelayReport, error)
+	AddAgentDelayReport(ctx context.Context, AgentID uint, DelayReportID uint) error
 }
 type TripOrder interface {
 	GetTripOrder(ctx context.Context, orderID uint) (tripentity.Trip, error)
+}
+type OrderDetail interface {
+	GetOrderByID(ctx context.Context, orderID uint) (orderentity.Order, error)
 }
 type LatencyEstimation interface {
 	GetEstimate(orderID uint) (estimateentity.Estimate, error)
@@ -20,9 +27,10 @@ type LatencyEstimation interface {
 type Service struct {
 	repo          Repository
 	tripOrder     TripOrder
+	orderDetail   OrderDetail
 	ltcEstimation LatencyEstimation
 }
 
-func New(repo Repository, tripOrder TripOrder, ltcEstimation LatencyEstimation) Service {
-	return Service{repo: repo, tripOrder: tripOrder, ltcEstimation: ltcEstimation}
+func New(repo Repository, tripOrder TripOrder, ltcEstimation LatencyEstimation, orderDetail OrderDetail) Service {
+	return Service{repo: repo, tripOrder: tripOrder, ltcEstimation: ltcEstimation, orderDetail: orderDetail}
 }
