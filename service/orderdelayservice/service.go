@@ -8,6 +8,7 @@ import (
 
 type Repository interface {
 	InsertDelayReport(ctx context.Context, orderID uint) error
+	HasPendingDelayReport(ctx context.Context, orderID uint) (bool, error)
 }
 type TripOrder interface {
 	GetTripOrder(ctx context.Context, orderID uint) (tripentity.Trip, error)

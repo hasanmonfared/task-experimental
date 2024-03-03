@@ -9,7 +9,15 @@ import (
 
 func (s Service) OrderDelay(ctx context.Context, req orderdelayparam.OrderDelayRequest) (orderdelayparam.OrderDelayResponse, error) {
 	const op = "orderdelayservice.OrderDelay"
-
+	exists, hErr := s.repo.HasPendingDelayReport(ctx, req.OrderID)
+	if hErr != nil {
+		return orderdelayparam.OrderDelayResponse{}, richerror.New(op).WithErr(hErr).WithKind(richerror.KindUnexpected)
+	}
+	if exists {
+		return orderdelayparam.OrderDelayResponse{
+			Message: "The order is in the delay list and is under review. be patient",
+		}, nil
+	}
 	trip, err := s.tripOrder.GetTripOrder(ctx, req.OrderID)
 	if err != nil {
 		return orderdelayparam.OrderDelayResponse{}, richerror.New(op).WithErr(err).WithKind(richerror.KindUnexpected)
@@ -34,7 +42,7 @@ func (s Service) OrderDelay(ctx context.Context, req orderdelayparam.OrderDelayR
 		if err != nil {
 			return orderdelayparam.OrderDelayResponse{}, richerror.New(op).WithErr(err).WithKind(richerror.KindUnexpected)
 		}
-		return orderdelayparam.OrderDelayResponse{DeliveryTime: newEstimateTime.NewEstimate, Message: "A new time was created to estimate the trip"}, nil
+		return orderdelayparam.OrderDelayResponse{DeliveryTime: &newEstimateTime.NewEstimate, Message: "A new time was created to estimate the trip"}, nil
 
 	default:
 		err = s.repo.InsertDelayReport(ctx, req.OrderID)
