@@ -4,10 +4,11 @@ import (
 	"gameapp/entity/estimateentity"
 	"gameapp/entity/tripentity"
 	"golang.org/x/net/context"
+	"time"
 )
 
 type Repository interface {
-	InsertDelayReport(ctx context.Context, orderID uint) error
+	InsertDelayReport(ctx context.Context, orderID uint, deliveryTime time.Time) error
 	HasPendingDelayReport(ctx context.Context, orderID uint) (bool, error)
 }
 type TripOrder interface {

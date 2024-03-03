@@ -5,6 +5,7 @@ import (
 	"gameapp/param/orderdelayparam"
 	"gameapp/pkg/richerror"
 	"golang.org/x/net/context"
+	"time"
 )
 
 func (s Service) OrderDelay(ctx context.Context, req orderdelayparam.OrderDelayRequest) (orderdelayparam.OrderDelayResponse, error) {
@@ -23,7 +24,8 @@ func (s Service) OrderDelay(ctx context.Context, req orderdelayparam.OrderDelayR
 		return orderdelayparam.OrderDelayResponse{}, richerror.New(op).WithErr(err).WithKind(richerror.KindUnexpected)
 	}
 	if (tripentity.Trip{}) == trip {
-		err = s.repo.InsertDelayReport(ctx, req.OrderID)
+		var delayTime time.Time
+		err = s.repo.InsertDelayReport(ctx, req.OrderID, delayTime)
 		if err != nil {
 			return orderdelayparam.OrderDelayResponse{}, richerror.New(op).WithErr(err).WithKind(richerror.KindUnexpected)
 		}
@@ -38,18 +40,21 @@ func (s Service) OrderDelay(ctx context.Context, req orderdelayparam.OrderDelayR
 		if eErr != nil {
 			return orderdelayparam.OrderDelayResponse{}, richerror.New(op).WithErr(eErr).WithKind(richerror.KindUnexpected)
 		}
-		err = s.repo.InsertDelayReport(ctx, req.OrderID)
+		err = s.repo.InsertDelayReport(ctx, req.OrderID, newEstimateTime.NewEstimate)
 		if err != nil {
 			return orderdelayparam.OrderDelayResponse{}, richerror.New(op).WithErr(err).WithKind(richerror.KindUnexpected)
 		}
 		return orderdelayparam.OrderDelayResponse{DeliveryTime: &newEstimateTime.NewEstimate, Message: "A new time was created to estimate the trip"}, nil
 
 	default:
-		err = s.repo.InsertDelayReport(ctx, req.OrderID)
+		var delayTime time.Time
+		err = s.repo.InsertDelayReport(ctx, req.OrderID, delayTime)
 		if err != nil {
 			return orderdelayparam.OrderDelayResponse{}, richerror.New(op).WithErr(err).WithKind(richerror.KindUnexpected)
 		}
-		return orderdelayparam.OrderDelayResponse{}, nil
+		return orderdelayparam.OrderDelayResponse{
+			Message: "Order added to delay queue.",
+		}, nil
 	}
 	return orderdelayparam.OrderDelayResponse{}, nil
 }

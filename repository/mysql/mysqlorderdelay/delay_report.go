@@ -10,12 +10,24 @@ import (
 	"time"
 )
 
-func (d DB) InsertDelayReport(ctx context.Context, orderID uint) error {
+func (d DB) InsertDelayReport(ctx context.Context, orderID uint, deliveryTime time.Time) error {
 	const op = "mysqlorderdelay.InsertDelayReport"
-	_, err := d.adapter.Conn().ExecContext(ctx, `insert into delay_reports(order_id)values(?)`, orderID)
+	var query string
+	var args []interface{}
+
+	if !deliveryTime.IsZero() {
+		query = `INSERT INTO delay_reports (order_id, delivery_time) VALUES (?, ?)`
+		args = []interface{}{orderID, deliveryTime}
+	} else {
+		query = `INSERT INTO delay_reports (order_id) VALUES (?)`
+		args = []interface{}{orderID}
+	}
+
+	_, err := d.adapter.Conn().ExecContext(ctx, query, args...)
 	if err != nil {
 		return richerror.New(op).WithErr(err).WithKind(richerror.KindUnexpected)
 	}
+
 	return nil
 }
 func (d DB) HasPendingDelayReport(ctx context.Context, orderID uint) (bool, error) {
