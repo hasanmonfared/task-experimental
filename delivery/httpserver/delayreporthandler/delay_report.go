@@ -1,6 +1,7 @@
 package delayreporthandler
 
 import (
+	"fmt"
 	"gameapp/param/delayreportparam"
 	"gameapp/pkg/httpmsg"
 	"github.com/labstack/echo/v4"
@@ -14,6 +15,7 @@ func (h Handler) delayReport(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest)
 	}
+	fmt.Println("req", req)
 	if filedErrors, err := h.delayReportValidator.ValidateDelayReportRequest(req); err != nil {
 		msg, code := httpmsg.Error(err)
 		return c.JSON(code, echo.Map{
@@ -23,7 +25,8 @@ func (h Handler) delayReport(c echo.Context) error {
 		return echo.NewHTTPError(code, msg, filedErrors)
 	}
 
-	resp, err := h.delayReportSvc.DelayReport(c.Request().Context(), delayreportparam.DelayReportRequest{OrderID: 1})
+	resp, err := h.delayReportSvc.DelayReport(c.Request().Context(), req)
+	fmt.Println("ERRRRR", err)
 	if err != nil {
 		msg, code := httpmsg.Error(err)
 		return echo.NewHTTPError(code, msg)

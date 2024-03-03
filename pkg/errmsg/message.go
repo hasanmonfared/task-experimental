@@ -12,4 +12,5 @@ const (
 	ErrorMsgOrderIDNotValid       = "order_id is not valid"
 	ErrorMsgAgentIDNotValid       = "agent_id is not valid"
 	ErrorMsgOrderReview           = "You have an order under review"
+	ErrorMsgOrderMayDelay         = "The order may be delayed"
 )

@@ -1,6 +1,7 @@
 package delayreportservice
 
 import (
+	"fmt"
 	"gameapp/entity/tripentity"
 	"gameapp/param/delayreportparam"
 	"gameapp/pkg/richerror"
@@ -11,6 +12,7 @@ import (
 func (s Service) DelayReport(ctx context.Context, req delayreportparam.DelayReportRequest) (delayreportparam.DelayReportResponse, error) {
 	const op = "delayreportservice.DelayReport"
 	exists, hErr := s.repo.HasPendingDelayReport(ctx, req.OrderID)
+	fmt.Println("hErr", hErr)
 	if hErr != nil {
 		return delayreportparam.DelayReportResponse{}, richerror.New(op).WithErr(hErr).WithKind(richerror.KindUnexpected)
 	}
@@ -19,13 +21,20 @@ func (s Service) DelayReport(ctx context.Context, req delayreportparam.DelayRepo
 			Message: "The order is in the delay list and is under review. be patient",
 		}, nil
 	}
+	order, dErr := s.orderDetail.GetOrderByID(ctx, req.OrderID)
+	fmt.Println("dErr", dErr)
+
+	if dErr != nil {
+		return delayreportparam.DelayReportResponse{}, richerror.New(op).WithErr(dErr).WithKind(richerror.KindUnexpected)
+	}
 	trip, err := s.tripOrder.GetTripOrder(ctx, req.OrderID)
+	fmt.Println("err", err)
 	if err != nil {
 		return delayreportparam.DelayReportResponse{}, richerror.New(op).WithErr(err).WithKind(richerror.KindUnexpected)
 	}
 	if (tripentity.Trip{}) == trip {
 		var delayTime time.Time
-		err = s.repo.InsertDelayReport(ctx, req.OrderID, delayTime)
+		err = s.repo.InsertDelayReport(ctx, order.VendorID, req.OrderID, delayTime)
 		if err != nil {
 			return delayreportparam.DelayReportResponse{}, richerror.New(op).WithErr(err).WithKind(richerror.KindUnexpected)
 		}
@@ -40,7 +49,7 @@ func (s Service) DelayReport(ctx context.Context, req delayreportparam.DelayRepo
 		if eErr != nil {
 			return delayreportparam.DelayReportResponse{}, richerror.New(op).WithErr(eErr).WithKind(richerror.KindUnexpected)
 		}
-		err = s.repo.InsertDelayReport(ctx, req.OrderID, newEstimateTime.NewEstimate)
+		err = s.repo.InsertDelayReport(ctx, order.VendorID, req.OrderID, newEstimateTime.NewEstimate)
 		if err != nil {
 			return delayreportparam.DelayReportResponse{}, richerror.New(op).WithErr(err).WithKind(richerror.KindUnexpected)
 		}
@@ -48,7 +57,7 @@ func (s Service) DelayReport(ctx context.Context, req delayreportparam.DelayRepo
 
 	default:
 		var delayTime time.Time
-		err = s.repo.InsertDelayReport(ctx, req.OrderID, delayTime)
+		err = s.repo.InsertDelayReport(ctx, order.VendorID, req.OrderID, delayTime)
 		if err != nil {
 			return delayreportparam.DelayReportResponse{}, richerror.New(op).WithErr(err).WithKind(richerror.KindUnexpected)
 		}

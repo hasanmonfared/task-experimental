@@ -10,7 +10,7 @@ import (
 )
 
 type Repository interface {
-	InsertDelayReport(ctx context.Context, orderID uint, deliveryTime time.Time) error
+	InsertDelayReport(ctx context.Context, vendorID uint, orderID uint, deliveryTime time.Time) error
 	HasPendingDelayReport(ctx context.Context, orderID uint) (bool, error)
 	GetFirstDelayReport(ctx context.Context) (delayreportentity.DelayReport, error)
 	AddAgentDelayReport(ctx context.Context, AgentID uint, DelayReportID uint) error

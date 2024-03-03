@@ -2,6 +2,7 @@ package mysqldelayreport
 
 import (
 	"database/sql"
+	"fmt"
 	"gameapp/adapter/mysql"
 	"gameapp/entity/delayreportentity"
 	"gameapp/pkg/errmsg"
@@ -10,17 +11,17 @@ import (
 	"time"
 )
 
-func (d DB) InsertDelayReport(ctx context.Context, orderID uint, deliveryTime time.Time) error {
+func (d DB) InsertDelayReport(ctx context.Context, vendorID uint, orderID uint, deliveryTime time.Time) error {
 	const op = "mysqldelayreport.InsertDelayReport"
 	var query string
 	var args []interface{}
 
 	if !deliveryTime.IsZero() {
-		query = `INSERT INTO delay_reports (order_id, delivery_time) VALUES (?, ?)`
-		args = []interface{}{orderID, deliveryTime}
+		query = `INSERT INTO delay_reports (vendor_id,order_id, delivery_time) VALUES (?,?, ?)`
+		args = []interface{}{vendorID, orderID, deliveryTime}
 	} else {
-		query = `INSERT INTO delay_reports (order_id) VALUES (?)`
-		args = []interface{}{orderID}
+		query = `INSERT INTO delay_reports (vendor_id,order_id) VALUES (?,?)`
+		args = []interface{}{vendorID, orderID}
 	}
 
 	_, err := d.adapter.Conn().ExecContext(ctx, query, args...)
@@ -32,7 +33,7 @@ func (d DB) InsertDelayReport(ctx context.Context, orderID uint, deliveryTime ti
 }
 func (d DB) HasPendingDelayReport(ctx context.Context, orderID uint) (bool, error) {
 	const op = "mysqldelayreport.HasPendingDelayReport"
-
+	fmt.Println(orderID)
 	row := d.adapter.Conn().QueryRowContext(ctx, `select * from delay_reports where order_id= ? AND delay_check = false`, orderID)
 	_, err := scanDelayReport(row)
 	if err != nil {
@@ -90,7 +91,7 @@ func scanDelayReport(scanner mysql.Scanner) (delayreportentity.DelayReport, erro
 	var createdAt time.Time
 	var deliveryTime sql.NullTime
 	var agentID sql.NullInt64
-	err := scanner.Scan(&report.ID, &report.OrderID, &agentID, &report.DelayCheck, &deliveryTime, &createdAt)
+	err := scanner.Scan(&report.ID, &report.VendorID, &report.OrderID, &agentID, &report.DelayCheck, &deliveryTime, &createdAt)
 
 	if agentID.Valid {
 		report.AgentID = uint(agentID.Int64)
