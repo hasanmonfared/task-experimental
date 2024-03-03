@@ -10,4 +10,6 @@ const (
 	ErrorMsgUserNotAllowed        = "user not allowed"
 	ErrorMsgCategoryIsNotValid    = "category is not valid"
 	ErrorMsgOrderIDNotValid       = "order_id is not valid"
+	ErrorMsgAgentIDNotValid       = "agent_id is not valid"
+	ErrorMsgOrderReview           = "You have an order under review"
 )

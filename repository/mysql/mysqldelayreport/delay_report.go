@@ -68,6 +68,23 @@ func (d DB) AddAgentDelayReport(ctx context.Context, AgentID uint, DelayReportID
 	}
 	return nil
 }
+
+func (d DB) CheckAgentBusyInQueue(AgentID uint) (bool, error) {
+	const op = "mysqldelayreport.CheckAgentBusyInQueue"
+	row := d.adapter.Conn().QueryRow(`select * from delay_reports where delay_check = false And  agent_id =?`, AgentID)
+	_, err := scanDelayReport(row)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return false, nil
+		}
+		return false, richerror.New(op).
+			WithErr(err).
+			WithMessage(errmsg.ErrorMsgCantScanQueryResult).
+			WithKind(richerror.KindUnexpected)
+	}
+	return true, nil
+}
+
 func scanDelayReport(scanner mysql.Scanner) (delayreportentity.DelayReport, error) {
 	var report delayreportentity.DelayReport
 	var createdAt time.Time

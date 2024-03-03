@@ -7,10 +7,12 @@ import (
 	"gameapp/config"
 	"gameapp/delivery/httpserver"
 	"gameapp/repository/migrator"
+	"gameapp/repository/mysql/mysqlagent"
 	"gameapp/repository/mysql/mysqldelayreport"
 	"gameapp/repository/mysql/mysqlorder"
 	"gameapp/repository/mysql/mysqltrip"
 	"gameapp/repository/mysql/mysqluser"
+	"gameapp/service/agentservice"
 	"gameapp/service/delayreportservice"
 	"gameapp/service/orderservice"
 	"gameapp/service/tripservice"
@@ -61,8 +63,9 @@ func setupServices(cfg config.Config) (userservice.Service, uservalidator.Valida
 	mysqlOrder := mysqlorder.New(mysqlAdapter)
 	orderSvc := orderservice.New(mysqlOrder)
 	delayReportSvc := delayreportservice.New(mysqlDelayReport, tripSvc, estimateClient, orderSvc)
-
-	orderV := delayreportvalidator.New(mysqlOrder)
+	mysqlAgent := mysqlagent.New(mysqlAdapter)
+	agentSvc := agentservice.New(mysqlAgent)
+	orderV := delayreportvalidator.New(delayReportSvc, agentSvc, mysqlOrder)
 	// User
 	mysqlUser := mysqluser.New(mysqlAdapter)
 	uV := uservalidator.New(&mysqlUser)

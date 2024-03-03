@@ -15,6 +15,16 @@ func (h Handler) getDelayReport(c echo.Context) error {
 	req := delayreportparam.GetDelayReportRequest{
 		AgentID: uint(agentID),
 	}
+
+	if filedErrors, err := h.delayReportValidator.ValidateGetDelayReportRequest(req); err != nil {
+		msg, code := httpmsg.Error(err)
+		return c.JSON(code, echo.Map{
+			"message": msg,
+			"errors":  filedErrors,
+		})
+		return echo.NewHTTPError(code, msg, filedErrors)
+	}
+
 	resp, err := h.delayReportSvc.GetDelayReport(c.Request().Context(), req)
 	if err != nil {
 		msg, code := httpmsg.Error(err)

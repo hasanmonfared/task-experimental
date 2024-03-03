@@ -14,6 +14,7 @@ type Repository interface {
 	HasPendingDelayReport(ctx context.Context, orderID uint) (bool, error)
 	GetFirstDelayReport(ctx context.Context) (delayreportentity.DelayReport, error)
 	AddAgentDelayReport(ctx context.Context, AgentID uint, DelayReportID uint) error
+	CheckAgentBusyInQueue(AgentID uint) (bool, error)
 }
 type TripOrder interface {
 	GetTripOrder(ctx context.Context, orderID uint) (tripentity.Trip, error)

@@ -25,7 +25,7 @@ func (d DB) IsOrderExceedingTheTimeDelivery(orderID uint) (bool, error) {
 }
 func (d DB) GetDetailOrderByID(ctx context.Context, orderID uint) (orderentity.Order, error) {
 	const op = "mysqlorder.GetDetailOrderByID"
-	row := d.adapter.Conn().QueryRow(`select * from orders where id= ?`, orderID)
+	row := d.adapter.Conn().QueryRowContext(ctx, `select * from orders where id= ?`, orderID)
 	order, err := scanOrder(row)
 	if err != nil {
 		if err == sql.ErrNoRows {
