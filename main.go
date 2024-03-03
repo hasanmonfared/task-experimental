@@ -65,7 +65,7 @@ func setupServices(cfg config.Config) (userservice.Service, uservalidator.Valida
 	delayReportSvc := delayreportservice.New(mysqlDelayReport, tripSvc, estimateClient, orderSvc)
 	mysqlAgent := mysqlagent.New(mysqlAdapter)
 	agentSvc := agentservice.New(mysqlAgent)
-	orderV := delayreportvalidator.New(delayReportSvc, agentSvc, mysqlOrder)
+	orderV := delayreportvalidator.New(delayReportSvc, agentSvc, orderSvc)
 	// User
 	mysqlUser := mysqluser.New(mysqlAdapter)
 	uV := uservalidator.New(&mysqlUser)

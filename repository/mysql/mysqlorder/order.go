@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func (d DB) IsOrderExceedingTheTimeDelivery(orderID uint) (bool, error) {
+func (d DB) IsOrderTheTimeDelivery(orderID uint) (bool, error) {
 	const op = "mysqlorder.IsOrderExceedingTheTimeDelivery"
 	row := d.adapter.Conn().QueryRow(`select * from orders where id= ? AND delivery_time<= NOW() AND status = ?`, orderID, orderentity.ReadyToSendStatusStr)
 	_, err := scanOrder(row)
