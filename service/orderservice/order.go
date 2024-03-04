@@ -9,19 +9,29 @@ import (
 	"time"
 )
 
-func (s Service) IsOrderExceedingTheTimeDelivery(orderID uint) (bool, error) {
+func (s Service) IsOrderExceedingTheTimeDelivery(orderID uint) (bool, bool, error) {
 	const op = "orderservice.IsOrderExceedingTheTimeDelivery"
 	order, err := s.repo.GetDetailOrderByID(context.Background(), orderID)
 	fmt.Println("GetDetailOrderByID", order)
 	if err != nil {
-		return false, richerror.New(op).WithErr(err)
+		return false, false, richerror.New(op).WithErr(err)
 	}
 	if order.Status != orderentity.ReadyToSendStatus {
-		return false, richerror.New(op).WithMessage(errmsg.ErrorMsgOrderIDNotValid)
+		return false, true, richerror.New(op).WithMessage(errmsg.ErrorMsgOrderIDNotValid)
 	}
 	deliveryTime := order.CreatedAt.Add(time.Duration(order.DeliveryTime) * time.Minute)
-	if deliveryTime.Before(time.Now()) {
-		return true, nil
+	if deliveryTime.Before(getCurrentTime()) {
+		return true, true, nil
 	}
-	return false, richerror.New(op)
+	return false, true, richerror.New(op)
+}
+func getCurrentTime() time.Time {
+	currentTime := time.Now()
+
+	formattedString := currentTime.Format("2006-01-02 15:04:05 +0000 UTC")
+	parsedTime, err := time.Parse("2006-01-02 15:04:05 -0700 MST", formattedString)
+	if err != nil {
+		fmt.Println("Error parsing time:", err)
+	}
+	return parsedTime
 }

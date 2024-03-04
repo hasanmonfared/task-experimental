@@ -15,7 +15,6 @@ func (h Handler) delayReport(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest)
 	}
-	fmt.Println("req", req)
 	if filedErrors, err := h.delayReportValidator.ValidateDelayReportRequest(req); err != nil {
 		msg, code := httpmsg.Error(err)
 		return c.JSON(code, echo.Map{

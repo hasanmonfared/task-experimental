@@ -37,7 +37,15 @@ func (v Validator) ValidateDelayReportRequest(req delayreportparam.DelayReportRe
 
 func (v Validator) checkIsOrderTimeDelivery(value interface{}) error {
 	orderID := value.(uint)
-	if isExists, err := v.order.IsOrderExceedingTheTimeDelivery(orderID); err != nil {
+	isExists, orderFound, err := v.order.IsOrderExceedingTheTimeDelivery(orderID)
+	if err != nil {
+		if !orderFound {
+			return fmt.Errorf(errmsg.ErrorMsgOrderIDNotValid)
+		}
+		if !isExists {
+			return fmt.Errorf(errmsg.ErrorMsgOrderMayDelay)
+		}
+	} else {
 		if !isExists {
 			return fmt.Errorf(errmsg.ErrorMsgOrderMayDelay)
 		}

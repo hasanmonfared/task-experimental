@@ -4,7 +4,7 @@ type Repository interface {
 	CheckQueueAgentID(agentID uint) (bool, error)
 }
 type Order interface {
-	IsOrderExceedingTheTimeDelivery(orderID uint) (bool, error)
+	IsOrderExceedingTheTimeDelivery(orderID uint) (bool, bool, error)
 }
 type Agent interface {
 	ExistsAgentID(agentID uint) (bool, error)
