@@ -10,8 +10,8 @@ create table delay_reports
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (order_id) REFERENCES orders (id),
     FOREIGN KEY (agent_id) REFERENCES agents (id),
-    FOREIGN KEY (vendor_id) REFERENCES vendors (id)
-
+    FOREIGN KEY (vendor_id) REFERENCES vendors (id),
+    index(vendor_id,order_id)
 );
 -- +migrate Down
 DROP TABLE delay_reports;

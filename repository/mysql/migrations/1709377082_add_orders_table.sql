@@ -8,7 +8,9 @@ create table orders
     status        enum ('submit','in_doing','ready_to_send') not null,
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users (id),
-    FOREIGN KEY (vendor_id) REFERENCES vendors (id)
+    FOREIGN KEY (vendor_id) REFERENCES vendors (id),
+    INDEX (user_id, vendor_id)
+
 
 );
 -- +migrate Down
