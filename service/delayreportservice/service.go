@@ -5,6 +5,7 @@ import (
 	"gameapp/entity/estimateentity"
 	"gameapp/entity/orderentity"
 	"gameapp/entity/tripentity"
+	"gameapp/param/delayreportparam"
 	"golang.org/x/net/context"
 )
 
@@ -14,6 +15,7 @@ type Repository interface {
 	GetFirstDelayReport(ctx context.Context) (delayreportentity.DelayReport, error)
 	AddAgentDelayReport(ctx context.Context, AgentID uint, DelayReportID uint) error
 	CheckAgentBusyInQueue(AgentID uint) (bool, error)
+	GetReportDelayVendor(ctx context.Context) ([]delayreportparam.ReportLastWeekResponse, error)
 }
 type TripOrder interface {
 	GetTripOrder(ctx context.Context, orderID uint) (tripentity.Trip, error)

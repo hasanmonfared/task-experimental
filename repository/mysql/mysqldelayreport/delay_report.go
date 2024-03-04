@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gameapp/adapter/mysql"
 	"gameapp/entity/delayreportentity"
+	"gameapp/param/delayreportparam"
 	"gameapp/pkg/errmsg"
 	"gameapp/pkg/richerror"
 	"golang.org/x/net/context"
@@ -85,7 +86,44 @@ func (d DB) CheckAgentBusyInQueue(AgentID uint) (bool, error) {
 	}
 	return true, nil
 }
+func (d DB) GetReportDelayVendor(ctx context.Context) ([]delayreportparam.ReportLastWeekResponse, error) {
+	const op = "mysqldelayreport.GetReportDelayVendor"
+	report := make([]delayreportparam.ReportLastWeekResponse, 0)
 
+	rows, err := d.adapter.Conn().Query(`SELECT
+    vendors.id AS vendor_id,
+    vendors.name AS vendor_name,
+    SUM(delay_reports.delay_check) AS total_delays_in_last_week
+FROM
+    vendors
+LEFT JOIN
+    orders ON vendors.id = orders.vendor_id
+LEFT JOIN
+    delay_reports ON orders.id = delay_reports.order_id
+WHERE
+    delay_reports.created_at >= CURDATE() - INTERVAL 1 WEEK
+GROUP BY
+    vendors.id, vendors.name
+ORDER BY
+    total_delays_in_last_week DESC;`)
+	if err != nil {
+		return nil, richerror.New(op).WithErr(err).WithMessage(errmsg.ErrorMsgSomethingWentWrong).WithKind(richerror.KindUnexpected)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		rows.Scan()
+		rep, sErr := scanReport(rows)
+		if sErr != nil {
+			return nil, richerror.New(op).WithErr(sErr).WithMessage(errmsg.ErrorMsgSomethingWentWrong).WithKind(richerror.KindUnexpected)
+		}
+		report = append(report, rep)
+	}
+	if rErr := rows.Err(); rErr != nil {
+		return nil, richerror.New(op).WithErr(rErr).WithMessage(errmsg.ErrorMsgSomethingWentWrong).WithKind(richerror.KindUnexpected)
+
+	}
+	return report, nil
+}
 func scanDelayReport(scanner mysql.Scanner) (delayreportentity.DelayReport, error) {
 	var report delayreportentity.DelayReport
 	var createdAt time.Time
@@ -101,4 +139,10 @@ func scanDelayReport(scanner mysql.Scanner) (delayreportentity.DelayReport, erro
 	}
 	report.CreatedAt = createdAt
 	return report, err
+}
+
+func scanReport(scanner mysql.Scanner) (delayreportparam.ReportLastWeekResponse, error) {
+	var re delayreportparam.ReportLastWeekResponse
+	err := scanner.Scan(&re.VendorID, &re.VendorName, &re.TotalDelays)
+	return re, err
 }
