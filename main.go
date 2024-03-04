@@ -27,7 +27,7 @@ import (
 
 func main() {
 	cfg := config.Load("./config.yml")
-
+	time.Sleep(5 * time.Second)
 	mgr := migrator.New(cfg.Mysql)
 	mgr.Up()
 

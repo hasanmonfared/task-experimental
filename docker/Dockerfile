@@ -17,6 +17,7 @@ WORKDIR /bin
 
 COPY --from=build /app/main /bin/main
 COPY --from=build /app/config.yml /bin/config.yml
+COPY --from=build /app/repository/mysql/migrations /bin/repository/mysql/migrations
 
 EXPOSE 8787
 
