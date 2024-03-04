@@ -1,12 +1,17 @@
 package delayreporthandler
 
 import (
+	"gameapp/entity/orderentity"
 	"gameapp/param/delayreportparam"
 	"gameapp/pkg/httpmsg"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"strconv"
 )
+
+type Response struct {
+	Message string `json:"message"`
+}
 
 func (h Handler) getDelayReport(c echo.Context) error {
 
@@ -24,11 +29,14 @@ func (h Handler) getDelayReport(c echo.Context) error {
 		})
 		return echo.NewHTTPError(code, msg, filedErrors)
 	}
-
 	resp, err := h.delayReportSvc.GetDelayReport(c.Request().Context(), req)
 	if err != nil {
 		msg, code := httpmsg.Error(err)
 		return echo.NewHTTPError(code, msg)
+	}
+	if resp.Order == (orderentity.Order{}) {
+		r := Response{Message: resp.Message}
+		return c.JSON(http.StatusOK, r)
 	}
 	return c.JSON(http.StatusOK, resp)
 
